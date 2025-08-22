@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A to Z Packers & Movers — Staff Control Form + Tracker</title>
+  <meta name="color-scheme" content="light only">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --ink: #121417;
+      --muted: #667085;
+      --brand: #1565d8;
+      --ok: #16a34a;
+      --warn: #f59e0b;
+      --bad: #dc2626;
+      --shadow: 0 8px 24px rgba(16,24,40,.08);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    body{background:var(--bg);color:var(--ink)}
+    a{color:var(--brand);text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid #e5e7eb}
+    .brand{display:flex;align-items:center;gap:10px;padding:12px 16px}
+    .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#ff4d4f,#22c55e,#facc15);box-shadow:var(--shadow)}
+    .brand h1{font-size:18px;margin:0}
+    nav.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:8px 16px}
+    nav.tabs button{padding:10px 8px;border:none;border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:#111;font-weight:600;cursor:pointer}
+    nav.tabs button.active{outline:2px solid var(--brand)}
+    .grid{display:grid;gap:12px}
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media (min-width:900px){.cards{grid-template-columns:repeat(4,1fr)}}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    .card h3{margin:0 0 8px 0;font-size:14px;color:var(--muted)}
+    .stat{font-size:24px;font-weight:700}
+    .row{display:grid;gap:12px}
+    @media (min-width:900px){.row{grid-template-columns:1fr 1fr}}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+    textarea{min-height:80px;resize:vertical}
+    .btn{display:inline-flex;align-items:center;gap:8px;border:none;padding:12px 14px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+    .btn.secondary{background:#111827}
+    .btn.ghost{background:#fff;color:#111;border:1px solid #e5e7eb}
+    .btn.warn{background:var(--warn);color:#111}
+    .btn.bad{background:var(--bad)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+    th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:left;font-size:13px;vertical-align:top}
+    th{background:#f3f4f6;font-weight:700}
+    .hidden{display:none !important}
+    .pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:12px;background:#eef2ff;color:#1d4ed8}
+    .ok{color:var(--ok)}
+    .badc{color:var(--bad)}
+    .muted{color:var(--muted)}
+    .section{margin-top:14px}
+    .flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .right{margin-left:auto}
+    .mini{font-size:12px}
+    .footer{padding:16px;color:var(--muted);text-align:center}
+    .login{max-width:440px;margin:32px auto}
+    .floating-bar{position:sticky;bottom:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(6px);border:1px solid #e5e7eb;padding:8px;border-radius:14px;box-shadow:var(--shadow);display:flex;gap:8px;z-index:40}
+    .sticky-add{position:fixed;right:16px;bottom:84px;z-index:60}
+    .tag{display:inline-block;padding:4px 8px;background:#eef2f7;color:#111;border-radius:999px;font-size:12px}
+    .danger{color:#b91c1c}
+    .success{color:#166534}
+    .neutral{color:#374151}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#f3f4f6;border-radius:8px;padding:2px 6px;font-size:12px}
+    .action-links a{margin-right:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand container">
+      <div class="logo"></div>
+      <h1>A to Z Packers & Movers — Staff Control</h1>
+      <div class="right muted mini" id="loginStatus"></div>
+    </div>
+    <nav class="tabs container">
+      <button class="tabBtn active" data-tab="dashboard">Dashboard</button>
+      <button class="tabBtn" data-tab="entry">Entry</button>
+      <button class="tabBtn" data-tab="staff">Staff Master</button>
+      <button class="tabBtn" data-tab="broadcast">Broadcast & Reports</button>
+      <button class="tabBtn" data-tab="settings">Settings</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- LOGIN GATE -->
+    <section id="loginGate" class="login card">
+      <h2 style="margin:0 0 8px 0;">Admin Login</h2>
+      <p class="muted mini" style="margin-top:0">Access is restricted. Use your admin credentials.</p>
+      <div class="row">
+        <div class="card">
+          <label>Login ID</label>
+          <input id="loginId" placeholder="admin" autocomplete="username">
+          <label>Password</label>
+          <input id="loginPw" type="password" placeholder="••••••••" autocomplete="current-password">
+          <div class="flex" style="margin-top:10px">
+            <button class="btn" id="btnLogin">Login</button>
+            <button class="btn ghost" id="btnLogout" title="Clears current session">Logout</button>
+            <div id="loginMsg" class="muted mini"></div>
+          </div>
+          <p class="mini muted" style="margin-top:10px">Default ID: <span class="kbd">admin</span> | PW: <span class="kbd">AZ@2025</span> (change in code near top).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section">
+      <div class="cards">
+        <div class="card">
+          <h3>Today's Attendance</h3>
+          <div class="stat" id="statAttendance">0 P / 0 A / 0 L</div>
+        </div>
+        <div class="card">
+          <h3>Advances (₹)</h3>
+          <div class="stat" id="statAdvances">0</div>
+        </div>
+        <div class="card">
+          <h3>Penalties (₹)</h3>
+          <div class="stat" id="statPenalties">0</div>
+        </div>
+        <div class="card">
+          <h3>Leaves (Out / Return)</h3>
+          <div class="stat" id="statLeaves">0 / 0</div>
+        </div>
+      </div>
+
+      <div class="row section">
+        <div class="card">
+          <div class="flex">
+            <h3 style="margin:0;color:var(--ink)">Latest Entries</h3>
+            <div class="right toolbar">
+              <input id="filterDate" type="date">
+              <select id="filterStaff"><option value="">All staff</option></select>
+              <button class="btn ghost" id="btnClearFilters">Clear</button>
+            </div>
+          </div>
+          <div style="overflow:auto">
+            <table id="entriesTable">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Staff</th><th>Attendance</th><th>Work Status</th><th>Advance</th><th>Penalty</th><th>Fooding</th><th>Promise</th><th>Perm</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex">
+            <h3 style="margin:0;color:var(--ink)">Track Record (select a staff)</h3>
+            <select id="graphStaffSelect" style="max-width:260px"></select>
+          </div>
+          <canvas id="trackChart" height="280"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTRY FORM -->
+    <section id="entry" class="section hidden">
+      <div class="card">
+        <div class="flex">
+          <h3 style="margin:0;color:var(--ink)">Unified Entry Form</h3>
+          <span class="pill">IST timezone • 24×7 shifts</span>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Date</label>
+            <input id="fDate" type="date">
+          </div>
+          <div>
+            <label>Staff</label>
+            <select id="fStaff"></select>
+          </div>
+        </div>
+
+        <!-- NEW: Staff Mobile at entry time (WhatsApp target) -->
+        <div class="row">
+          <div>
+            <label>Staff Mobile (WhatsApp)</label>
+            <input id="fStaffPhone" placeholder="+91XXXXXXXXXX" inputmode="tel" autocomplete="tel">
+            <span class="mini muted">This number will be used for all notifications of this entry.</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Attendance</label>
+            <select id="fAttendance">
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Late">Late</option>
+            </select>
+          </div>
+          <div id="lateTimeWrap">
+            <label>Late Time (HH:MM)</label>
+            <input id="fLateTime" type="time" step="60">
+          </div>
+        </div>
+
+        <!-- Multi-day leave flow -->
+        <div class="row">
+          <div>
+            <label>Work Status</label>
+            <select id="fWorkStatus" title="Use for multi-day leave flow">
+              <option value="">None (on duty / normal)</option>
+              <option value="Checkout">Check-Out (start multi-day leave)</option>
+              <option value="ReturnCheckin">Return Check-In (end leave)</option>
+            </select>
+          </div>
+          <div>
+            <label>Reason (optional)</label>
+            <input id="fLeaveReason" placeholder="Reason (e.g., personal work)">
+          </div>
+        </div>
+
+        <div class="row" id="expectedReturnRow" style="display:none">
+          <div>
+            <label>Expected Return Date (promised)</label>
+            <input id="fExpectedReturn" type="date">
+          </div>
+          <div>
+            <label>Promise Type</label>
+            <select id="fPromise">
+              <option value="3|By Talk">By Talk (3)</option>
+              <option value="2|By SMS">By SMS (2)</option>
+              <option value="1|By God Promise">By God Promise (1)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Advance (₹)</label>
+            <input id="fAdvance" type="number" min="0" step="0.01" placeholder="0">
+          </div>
+          <div>
+            <label>Penalty (₹)</label>
+            <select id="fPenalty" title="Auto-required if promised return date is missed">
+              <option value="0">0</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+              <option value="2000">2000</option>
+              <option value="3000">3000</option>
+              <option value="5000">5000</option>
+              <option value="-1">Custom (enter salary)</option>
+            </select>
+            <input id="fPenaltyCustom" type="number" min="0" step="0.01" placeholder="Enter salary or custom amount" style="display:none">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Penalty Reason (required if penalty &gt; 0)</label>
+            <input id="fPenaltyReason" placeholder="Reason for penalty">
+          </div>
+          <div>
+            <label>Fooding Date (reference)</label>
+            <input id="fFoodDate" type="date">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Boss Permission?</label>
+            <select id="fPerm">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="card">
+            <label>Discipline Checklist</label>
+            <div class="flex">
+              <label><input type="checkbox" id="chkDiscipline"> Discipline maintained</label>
+              <label><input type="checkbox" id="chkUniform"> Uniform worn</label>
+              <label><input type="checkbox" id="chkObey"> Obeyed all rules</label>
+              <label><input type="checkbox" id="chkPunctual"> Punctual</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Special Instruction</label>
+            <textarea id="fNote" placeholder="Any instruction..."></textarea>
+          </div>
+        </div>
+
+        <div class="floating-bar">
+          <button class="btn" id="btnSave">Save</button>
+          <button class="btn secondary" id="btnSaveNotify">Save & Notify</button>
+          <button class="btn ghost" id="btnNotifyOnly">Notify Only</button>
+          <button class="btn warn" id="btnReset">Reset</button>
+          <div class="mini muted right">WhatsApp opens per action. Ensure pop-ups are allowed.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAFF MASTER -->
+    <section id="staff" class="section hidden">
+      <div class="card">
+        <div class="flex">
+          <h3 style="margin:0">Staff Master</h3>
+          <div class="right toolbar">
+            <input id="staffSearch" placeholder="Search name/role/phone">
+            <button class="btn" id="btnAddStaff">Add Staff</button>
+          </div>
+        </div>
+        <div style="overflow:auto">
+          <table id="staffTable">
+            <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- BROADCAST & REPORTS -->
+    <section id="broadcast" class="section hidden">
+      <div class="card">
+        <h3 style="margin-top:0">Broadcast to All Active Staff</h3>
+        <div class="toolbar">
+          <textarea id="broadcastMsg" placeholder="Type your notice...">📢 Boss Notice — A to Z Packers & Movers
+Please review your daily updates and maintain ✅ discipline, 👕 uniform, and 🕒 punctuality.
+🙏 Thank you.</textarea>
+          <button class="btn" id="btnBroadcast">Send to All (WhatsApp)</button>
+        </div>
+        <p class="mini muted">Opens WhatsApp for each staff sequentially. Tap back to return and send next.</p>
+      </div>
+
+      <div class="row">
+        <div class="card">
+          <h3 style="margin-top:0">Quick Reports</h3>
+          <div class="toolbar">
+            <input id="rFrom" type="date">
+            <input id="rTo" type="date">
+            <select id="rHas"><option value="">All</option><option value="adv">Has Advance</option><option value="pen">Has Penalty</option></select>
+            <button class="btn ghost" id="btnRunRpt">Run</button>
+            <button class="btn" id="btnExportCSV">Export CSV</button>
+          </div>
+          <div style="overflow:auto">
+            <table id="reportTable"><thead><tr>
+              <th>Date</th><th>Staff</th><th>Att</th><th>Status</th><th>Adv</th><th>Pen</th><th>Food</th><th>Promise</th><th>Perm</th><th>Note</th>
+            </tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0">Audit Log (latest)</h3>
+          <div id="auditLog" class="mini" style="max-height:300px;overflow:auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="section hidden">
+      <div class="card">
+        <h3 style="margin-top:0">Data Backup</h3>
+        <div class="toolbar">
+          <button class="btn" id="btnExport">Download Backup (.json)</button>
+          <input type="file" id="fileImport" accept=".json">
+          <button class="btn ghost" id="btnImport">Import & Merge</button>
+        </div>
+        <p class="mini muted">Uses IndexedDB for long-term storage (fallback to localStorage). You can back up and restore between devices.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Admin Session</h3>
+        <div class="toolbar">
+          <button class="btn ghost" id="btnForceLogout">Force Logout</button>
+        </div>
+        <p class="mini muted">Session persists in localStorage. Logout to protect access.</p>
+      </div>
+    </section>
+
+    <!-- Sticky Add -->
+    <button class="btn sticky-add" id="quickAdd">＋ Quick Entry</button>
+
+  </main>
+
+  <footer class="footer">
+    © <span id="yearNow"></span> A to Z Packers & Movers • Built for mobile-first use • All times in IST
+  </footer>
+
+  <script>
+  // =========================
+  // CONFIG (edit easily)
+  // =========================
+  const ADMIN_ID = 'admin';
+  const ADMIN_PW = 'AZ@2025';
+  const BOSS_E164 = '+919338888550'; // Boss WhatsApp (Manoj)
+  const IST_TZ = 'Asia/Kolkata';
+
+  // =========================
+  // UTILITIES
+  // =========================
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const todayStr = () => new Date().toLocaleDateString('en-CA',{timeZone:IST_TZ});
+  const toIST = (d)=> new Date(new Date(d).toLocaleString('en-US',{timeZone:IST_TZ}));
+  const fmtDate = (d)=> toIST(d).toLocaleDateString('en-CA',{timeZone:IST_TZ});
+  const fmtTimeHM = (d)=> toIST(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:IST_TZ});
+  const uuid = ()=> (crypto?.randomUUID ? crypto.randomUUID() : 'id-'+Math.random().toString(36).slice(2));
+
+  function sanitizePhoneToE164Indian(raw){
+    if(!raw) return '';
+    let p = (''+raw).trim();
+    p = p.replace(/[^\d+]/g,'');
+    if(p.startsWith('00')) p = '+'+p.slice(2);
+    if(p.startsWith('0')) p = '+91'+p.slice(1);
+    if(p.startsWith('91') && p.length===12) p = '+'+p;
+    if(!p.startsWith('+')) p = '+'+p;
+    if(!/^\+91\d{10}$/.test(p)) {
+      console.warn('Phone not valid E.164 India:', raw);
+    }
+    return p;
+  }
+
+  function waLink(e164, message){
+    const digits = (''+e164).replace(/\D/g,'');
+    return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+  }
+
+  function sum(arr){return arr.reduce((a,b)=>a+Number(b||0),0)}
+
+  // =========================
+  // INDEXEDDB (fallback to localStorage)
+  // =========================
+  const DB_NAME = 'az_staff_control_v1';
+  let db, idbSupported = 'indexedDB' in window;
+  function idbOpen(){
+    return new Promise((resolve,reject)=>{
+      if(!idbSupported){ resolve(null); return; }
+      const req = indexedDB.open(DB_NAME,1);
+      req.onupgradeneeded = (e)=>{
+        const db = e.target.result;
+        const staff = db.createObjectStore('staff',{keyPath:'id'});
+        staff.createIndex('by_status','status',{unique:false});
+        staff.createIndex('by_phone','phone',{unique:false});
+        const entries = db.createObjectStore('entries',{keyPath:'id'});
+        entries.createIndex('by_staff','staffId',{unique:false});
+        entries.createIndex('by_date','dateISO',{unique:false});
+        const audit = db.createObjectStore('audits',{keyPath:'id'});
+        audit.createIndex('by_ts','ts',{unique:false});
+      };
+      req.onsuccess = e=> resolve(e.target.result);
+      req.onerror = e=> reject(e.target.error);
+    });
+  }
+  function tx(store, mode='readonly'){ return db.transaction(store, mode).objectStore(store) }
+  function idbGetAll(store){ return new Promise((res,rej)=>{ const r=tx(store).getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })}
+  function idbPut(store, obj){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').put(obj); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })}
+  function idbDel(store, key){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); })}
+
+  // Fallback simple localStorage bags
+  function lsBag(key){ return JSON.parse(localStorage.getItem(key)||'[]') }
+  function lsSet(key,val){ localStorage.setItem(key, JSON.stringify(val)) }
+
+  async function storageGetAll(store){
+    if(db) return await idbGetAll(store);
+    return lsBag(store);
+  }
+  async function storagePut(store,obj){
+    if(db) return await idbPut(store,obj);
+    const bag = lsBag(store);
+    const i = bag.findIndex(x=>x.id===obj.id);
+    if(i>=0) bag[i]=obj; else bag.push(obj);
+    lsSet(store, bag);
+    return obj.id;
+  }
+  async function storageDelete(store, idKey){
+    if(db) return await idbDel(store,idKey);
+    const bag = lsBag(store).filter(x=>x.id!==idKey);
+    lsSet(store, bag);
+  }
+
+  async function addAudit(type, detail){
+    const rec = {id:uuid(), type, detail, ts:new Date().toISOString()};
+    await storagePut('audits', rec);
+    renderAudit();
+  }
+
+  // =========================
+  // SESSION
+  // =========================
+  function isLogged(){ return localStorage.getItem('adminLoggedIn')==='1' }
+  function setLogged(v){ localStorage.setItem('adminLoggedIn', v?'1':'0'); }
+
+  // =========================
+  // SEED DATA (first run)
+  // =========================
+  async function seedIfNeeded(){
+    const staff = await storageGetAll('staff');
+    if(staff.length===0){
+      const s1 = {id:uuid(), name:'Ajay Kumar', role:'Driver',  phone:'+919876543210', salary:18000, status:'Active', createdAt:new Date().toISOString()};
+      const s2 = {id:uuid(), name:'Somnath',    role:'Driver',  phone:'+919123456789', salary:18000, status:'Active', createdAt:new Date().toISOString()};
+      const s3 = {id:uuid(), name:'Dhaneswar',  role:'Worker',  phone:'+919000000001', salary:15000, status:'Active', createdAt:new Date().toISOString()};
+      await storagePut('staff', s1); await storagePut('staff', s2); await storagePut('staff', s3);
+      await addAudit('seed','Seeded staff records');
+    }
+  }
+
+  // =========================
+  // STATE
+  // =========================
+  let chart, entriesCache=[], staffCache=[];
+
+  // =========================
+  // RENDER HELPERS
+  // =========================
+  function showTab(tab){
+    $$('.tabBtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    ['dashboard','entry','staff','broadcast','settings'].forEach(id=>{
+      const sec = document.getElementById(id);
+      if(sec) sec.classList.toggle('hidden', id!==tab);
+    });
+    if(tab==='dashboard'){ renderDashboard(); }
+    if(tab==='entry'){ focusEntryForm(); }
+    if(tab==='staff'){ renderStaffTable(); }
+  }
+
+  function gateLoginUI(){
+    const gated = !isLogged();
+    $('#loginGate').classList.toggle('hidden', !gated);
+    ['dashboard','entry','staff','broadcast','settings','quickAdd'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.classList.toggle('hidden', gated);
+    });
+    $('#loginStatus').textContent = isLogged() ? '✅ Admin active' : '🔒 Locked';
+  }
+
+  function selectOptionsFromStaff(sel){
+    sel.innerHTML = '';
+    const id = sel.id;
+    if(id!=='filterStaff' && id!=='graphStaffSelect'){
+      const optAll = document.createElement('option');
+      optAll.value = ''; optAll.textContent = 'Select staff…';
+      sel.appendChild(optAll);
+    }
+    staffCache.filter(s=>s.status!=='Inactive').forEach(s=>{
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = `${s.name} (${s.role})`;
+      sel.appendChild(o);
+    });
+  }
+
+  function focusEntryForm(){
+    $('#fDate').value = todayStr();
+    selectOptionsFromStaff($('#fStaff'));
+    $('#fAttendance').value = 'Present';
+    $('#lateTimeWrap').style.display = 'none';
+    $('#fPenalty').value = '0';
+    setPenaltyCustomVisibility();
+    $('#fWorkStatus').value = '';
+    showExpectedReturn(false);
+    $('#fStaffPhone').value = ''; // clear until staff chosen
+  }
+
+  function renderAudit(){
+    storageGetAll('audits').then(rows=>{
+      rows.sort((a,b)=> new Date(b.ts)-new Date(a.ts));
+      $('#auditLog').innerHTML = rows.slice(0,50).map(r=>{
+        const t = toIST(r.ts);
+        return `<div>📝 <b>${r.type}</b> — <span class="muted">${fmtDate(t)} ${fmtTimeHM(t)}</span><br>${r.detail}</div>`;
+      }).join('');
+    });
+  }
+
+  function staffById(id){ return staffCache.find(s=>s.id===id) }
+
+  function renderEntriesTable(){
+    const tbody = $('#entriesTable tbody');
+    const fd = $('#filterDate').value;
+    const fs = $('#filterStaff').value;
+    let rows = entriesCache.slice();
+    if(fd) rows = rows.filter(r=>r.dateISO===fd);
+    if(fs) rows = rows.filter(r=>r.staffId===fs);
+    rows.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+    tbody.innerHTML = rows.slice(0,200).map(r=>{
+      const st = staffById(r.staffId) || {name:'[deleted]', role:''};
+      const promLabel = r.promise?.split('|')[1] || '';
+      const statusTxt = r.leaveType==='Checkout'
+        ? `Check-Out → Return by ${r.expectedReturnDate||'-'}${r.leaveReason?`<div class="mini muted">${r.leaveReason}</div>`:''}`
+        : r.leaveType==='ReturnCheckin'
+          ? `Return Check-In${r.leaveReason?`<div class="mini muted">${r.leaveReason}</div>`:''}`
+          : (r.leaveReason?`On duty<div class="mini muted">${r.leaveReason}</div>`:'On duty');
+      return `<tr>
+        <td>${r.dateISO}</td>
+        <td>${st.name}</td>
+        <td>${r.attendance}${r.attendance==='Late' && r.lateTime?` (${r.lateTime})`:''}</td>
+        <td>${statusTxt}</td>
+        <td>₹${Number(r.advance||0).toFixed(0)}</td>
+        <td>${Number(r.penalty||0)>0?`<span class="danger">₹${Number(r.penalty).toFixed(0)}</span>`:'₹0'}${r.penaltyReason?`<div class="mini muted">${r.penaltyReason}</div>`:''}</td>
+        <td>${r.foodDate||''}</td>
+        <td>${promLabel||''}</td>
+        <td>${r.perm||''}</td>
+        <td class="action-links">
+          <a href="#" data-act="notify" data-id="${r.id}">Notify</a>
+          <a href="#" data-act="edit" data-id="${r.id}">Edit</a>
+          <a href="#" class="danger" data-act="del" data-id="${r.id}">Delete</a>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderDashboard(){
+    Promise.all([storageGetAll('entries'), storageGetAll('staff')]).then(([entries, staff])=>{
+      entriesCache = entries; staffCache = staff;
+      selectOptionsFromStaff($('#filterStaff'));
+      selectOptionsFromStaff($('#graphStaffSelect'));
+      const today = todayStr();
+      const todays = entries.filter(e=>e.dateISO===today);
+      const P = todays.filter(e=>e.attendance==='Present').length;
+      const A = todays.filter(e=>e.attendance==='Absent').length;
+      const L = todays.filter(e=>e.attendance==='Late').length;
+      $('#statAttendance').textContent = `${P} P / ${A} A / ${L} L`;
+      $('#statAdvances').textContent = todays.reduce((a,b)=>a+Number(b.advance||0),0);
+      $('#statPenalties').textContent = todays.reduce((a,b)=>a+Number(b.penalty||0),0);
+      const out = todays.filter(e=>e.leaveType==='Checkout').length;
+      const ret = todays.filter(e=>e.leaveType==='ReturnCheckin').length;
+      $('#statLeaves').textContent = `${out} / ${ret}`;
+      renderEntriesTable();
+      renderChart();
+    });
+  }
+
+  function renderStaffTable(){
+    const q = ($('#staffSearch').value||'').toLowerCase();
+    const tbody = $('#staffTable tbody');
+    const rows = staffCache.filter(s=> (s.name+s.role+s.phone).toLowerCase().includes(q));
+    rows.sort((a,b)=> a.name.localeCompare(b.name));
+    tbody.innerHTML = rows.map(s=>{
+      return `<tr>
+        <td>${s.name}</td>
+        <td>${s.role}</td>
+        <td>${s.phone||''}</td>
+        <td>₹${Number(s.salary||0).toFixed(0)}</td>
+        <td>${s.status||'Active'}</td>
+        <td>
+          <a href="#" data-act="editStaff" data-id="${s.id}">Edit</a>
+          <a href="#" data-act="toggleStaff" data-id="${s.id}">${(s.status||'Active')==='Active'?'Deactivate':'Activate'}</a>
+          <a href="${waLink(s.phone||'', 'Namaskar 👋')}" target="_blank">WhatsApp</a>
+        </td>
+      </tr>`;
+    }).join('');
+    selectOptionsFromStaff($('#fStaff'));
+    selectOptionsFromStaff($('#graphStaffSelect'));
+  }
+
+  function renderChart(){
+    const sel = $('#graphStaffSelect').value;
+    const ctx = $('#trackChart').getContext('2d');
+    let data = [];
+    let labels = [];
+    const days = 14;
+    for(let i=days-1;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const iso = d.toLocaleDateString('en-CA',{timeZone:IST_TZ});
+      labels.push(iso.slice(5));
+      const list = entriesCache.filter(e=>e.dateISO===iso && (!sel || e.staffId===sel));
+      let score = 0;
+      list.forEach(e=>{
+        if(e.attendance==='Present') score += 1;
+        if(e.attendance==='Late') score += 0.5;
+        score -= (Number(e.penalty||0)>0)?0.1:0;
+      });
+      data.push(score);
+    }
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type:'line',
+      data:{labels, datasets:[{label:'Discipline score (last 14d)', data, tension:0.35, fill:false}]},
+      options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}}
+    });
+  }
+
+  // =========================
+  // MULTI-DAY LEAVE HELPERS
+  // =========================
+  async function getOpenCheckoutFor(staffId){
+    const all = await storageGetAll('entries');
+    const lastCheckout = [...all]
+      .filter(e=> e.staffId===staffId && e.leaveType==='Checkout')
+      .sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt))[0];
+    if(!lastCheckout) return null;
+    const hasReturn = all.some(e=> e.staffId===staffId && e.leaveType==='ReturnCheckin' && new Date(e.createdAt) > new Date(lastCheckout.createdAt));
+    return hasReturn ? null : lastCheckout;
+  }
+
+  function showExpectedReturn(show){
+    const row = document.getElementById('expectedReturnRow');
+    row.style.display = show ? 'grid' : 'none';
+  }
+
+  function setPenaltyCustomVisibility(){
+    const v = $('#fPenalty').value;
+    const custom = $('#fPenaltyCustom');
+    if(v==='-1'){
+      const st = staffById($('#fStaff').value||'');
+      const sal = Number(st?.salary||0);
+      custom.style.display='block';
+      if(sal>0 && !custom.value) custom.value = sal;
+    } else {
+      custom.style.display='none';
+      custom.value='';
+    }
+  }
+
+  // =========================
+  // PHONE SYNC
+  // =========================
+  async function maybeSyncStaffPhone(staffId, newPhone){
+    const st = staffById(staffId);
+    if(st && /^\+91\d{10}$/.test(newPhone) && st.phone !== newPhone){
+      st.phone = newPhone;
+      await storagePut('staff', st);
+      await addAudit('staff.phone.update', `${st.name} • ${newPhone}`);
+      staffCache = await storageGetAll('staff');
+    }
+  }
+
+  // =========================
+  // CRUD: Staff
+  // =========================
+  async function openStaffDialog(existing){
+    const name = prompt('Staff Name:', existing?.name||'');
+    if(!name) return;
+
+    const role = prompt('Role (Driver/Worker/Other):', existing?.role||'Worker')||'Worker';
+
+    let phone = '';
+    while(true){
+      phone = prompt('Mobile (WhatsApp) — 10–13 digits, India-friendly:', existing?.phone||'')||'';
+      phone = sanitizePhoneToE164Indian(phone);
+      if(/^\+91\d{10}$/.test(phone)) break;
+      alert('Please enter a valid Indian mobile (e.g., 9XXXXXXXXX). It is required for WhatsApp.');
+    }
+
+    let salary = Number(prompt('Monthly Salary (₹):', existing?.salary ?? '0')||'0');
+    if(isNaN(salary) || salary<0) salary = 0;
+
+    const dup = staffCache.find(s=> s.phone===phone && s.id !== (existing?.id||''));
+    if(dup){ alert(`Mobile already linked to ${dup.name}.`); return; }
+
+    const status = existing?.status||'Active';
+    const rec = {
+      id: existing?.id||uuid(),
+      name,
+      role,
+      phone,
+      salary,
+      status,
+      createdAt: existing?.createdAt||new Date().toISOString()
+    };
+
+    await storagePut('staff', rec);
+    await addAudit(existing?'staff.update':'staff.add', `${name} • ${role} • ${phone} • ₹${salary}`);
+    staffCache = await storageGetAll('staff');
+    renderStaffTable();
+  }
+
+  async function toggleStaff(id){
+    const s = staffCache.find(x=>x.id===id); if(!s) return;
+    s.status = (s.status||'Active')==='Active'?'Inactive':'Active';
+    await storagePut('staff', s);
+    await addAudit('staff.status', `${s.name} → ${s.status}`);
+    staffCache = await storageGetAll('staff');
+    renderStaffTable();
+  }
+
+  // =========================
+  // CRUD: Entries
+  // =========================
+  function penaltyValue(){
+    const v = $('#fPenalty').value;
+    if(v==='-1'){ return Number($('#fPenaltyCustom').value||0); }
+    return Number(v||0);
+  }
+
+  function buildEntryFromForm(idOverride){
+    const staffId = $('#fStaff').value;
+    const st = staffById(staffId);
+    const workStatus = $('#fWorkStatus').value; // '', 'Checkout', 'ReturnCheckin'
+    const staffPhone = sanitizePhoneToE164Indian($('#fStaffPhone').value||'');
+    return {
+      id: idOverride||uuid(),
+      dateISO: $('#fDate').value || todayStr(),
+      staffId,
+      staffName: st?.name||'',
+      staffPhone, // used for WhatsApp notifications for this entry
+      attendance: $('#fAttendance').value,
+      lateTime: $('#fAttendance').value==='Late' ? ($('#fLateTime').value||'') : '',
+      leaveType: workStatus,                            // Checkout / ReturnCheckin / ''
+      leaveReason: $('#fLeaveReason').value,
+      expectedReturnDate: workStatus==='Checkout' ? ($('#fExpectedReturn').value||'') : '',
+      advance: Number($('#fAdvance').value||0),
+      penalty: penaltyValue(),
+      penaltyReason: $('#fPenaltyReason').value,
+      foodDate: $('#fFoodDate').value||'',
+      promise: (workStatus==='Checkout' ? $('#fPromise').value : ($('#fPromise').value||'')),
+      perm: $('#fPerm').value,
+      flags: {
+        discipline: $('#chkDiscipline').checked,
+        uniform: $('#chkUniform').checked,
+        obey: $('#chkObey').checked,
+        punctual: $('#chkPunctual').checked
+      },
+      note: $('#fNote').value,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function validateEntry(e){
+    if(!e.staffId){ alert('Please select a staff.'); return false; }
+    if(!/^\+91\d{10}$/.test(e.staffPhone||'')){
+      alert('Please enter a valid Staff Mobile (e.g., +9198XXXXXXXX).');
+      return false;
+    }
+    if(e.attendance==='Late' && !e.lateTime){ alert('Please set Late Time.'); return false; }
+
+    if(e.leaveType==='Checkout' && !e.expectedReturnDate){
+      alert('Expected Return Date is required for Check-Out.');
+      return false;
+    }
+
+    if(Number(e.penalty)>0 && !e.penaltyReason){
+      alert('Penalty reason is required.');
+      return false;
+    }
+    return true;
+  }
+
+  function messageForEntry(e){
+    const st = staffById(e.staffId)||{};
+    const pname = st.name || 'Staff';
+    const d = e.dateISO;
+    const att = e.attendance + (e.attendance==='Late' && e.lateTime?` (${e.lateTime})`:'');
+    const leaveLine =
+      e.leaveType==='Checkout'      ? ` • Status: ✅ Check-Out (multi-day)\n   Expected Return: ${e.expectedReturnDate||'-'}`
+    : e.leaveType==='ReturnCheckin' ? ` • Status: ✅ Return Check-In`
+    : '';
+    const adv = Number(e.advance||0)>0?` • Advance: ₹${Number(e.advance).toFixed(0)}`:'';
+    const pen = Number(e.penalty||0)>0?` • Penalty: ₹${Number(e.penalty).toFixed(0)} (${e.penaltyReason})`:'';
+    const chk = [
+      e.flags?.discipline?'✅ Discipline':'❌ Discipline',
+      e.flags?.uniform?'✅ Uniform':'❌ Uniform',
+      e.flags?.punctual?'✅ Punctual':'❌ Punctual'
+    ].join(' • ');
+
+    return `📋 A to Z Packers & Movers — Staff Update
+👤 ${pname}
+📅 ${d}
+⏱️ Attendance: ${att}
+${leaveLine}
+${adv}${adv&&pen?'\n':''}${pen}
+🔎 Checks: ${chk}
+📝 ${e.note||'—'}
+🙏 Thank you.`.replace(/\n\s*\n/g,'\n');
+  }
+
+  async function saveEntry(notify=false){
+    const entry = buildEntryFromForm();
+    if(!validateEntry(entry)) return;
+
+    // If Return Check-In, verify lateness vs promised date -> require penalty selection
+    if(entry.leaveType==='ReturnCheckin'){
+      const open = await getOpenCheckoutFor(entry.staffId);
+      if(open && open.expectedReturnDate){
+        const today = entry.dateISO || todayStr();
+        if(today > open.expectedReturnDate && Number(entry.penalty||0)===0){
+          alert(`Late Return detected (promised ${open.expectedReturnDate}). Please choose a penalty value (₹500–₹5000) or Custom (salary).`);
+          $('#fPenalty').focus();
+          return;
+        }
+      }
+    }
+
+    // Sync staff phone master if changed/empty previously
+    await maybeSyncStaffPhone(entry.staffId, entry.staffPhone);
+
+    await storagePut('entries', entry);
+    entriesCache = await storageGetAll('entries');
+    await addAudit('entry.add', `${entry.staffName} • ${entry.dateISO} • ${entry.attendance} • ${entry.leaveType||'On duty'}`);
+    renderDashboard();
+
+    if(notify){ openWhatsAppsForEntry(entry); }
+    else { alert('Saved ✅'); }
+  }
+
+  function openWhatsAppsForEntry(entry){
+    const st = staffById(entry.staffId)||{};
+    const msg = messageForEntry(entry);
+    const primary = entry.staffPhone || st.phone || '';
+    const toStaff = primary ? waLink(primary, msg) : null;
+    const toBoss  = waLink(BOSS_E164, msg);
+    if(toStaff) window.open(toStaff, '_blank');
+    setTimeout(()=> window.open(toBoss, '_blank'), toStaff?800:0);
+  }
+
+  async function deleteEntry(id){
+    await storageDelete('entries', id);
+    entriesCache = await storageGetAll('entries');
+    await addAudit('entry.del', id);
+    renderDashboard();
+  }
+
+  function loadEntryToForm(id){
+    const e = entriesCache.find(x=>x.id===id); if(!e) return;
+    showTab('entry');
+    $('#fDate').value = e.dateISO;
+    $('#fStaff').value = e.staffId;
+    $('#fStaffPhone').value = e.staffPhone || (staffById(e.staffId)?.phone||'');
+    $('#fAttendance').value = e.attendance;
+    $('#lateTimeWrap').style.display = (e.attendance==='Late')?'block':'none';
+    $('#fLateTime').value = e.lateTime||'';
+    $('#fWorkStatus').value = e.leaveType||'';
+    $('#fLeaveReason').value = e.leaveReason||'';
+    if(e.leaveType==='Checkout'){
+      showExpectedReturn(true);
+      $('#fExpectedReturn').value = e.expectedReturnDate||'';
+      $('#fPromise').value = e.promise||'3|By Talk';
+    }else{
+      showExpectedReturn(false);
+      $('#fExpectedReturn').value = '';
+      $('#fPromise').value = '3|By Talk';
+    }
+    $('#fAdvance').value = Number(e.advance||0);
+    const stdPen = [0,500,1000,2000,3000,5000];
+    if(stdPen.includes(Number(e.penalty||0))){
+      $('#fPenalty').value = String(Number(e.penalty||0));
+      $('#fPenaltyCustom').style.display='none';
+      $('#fPenaltyCustom').value = '';
+    } else {
+      $('#fPenalty').value = '-1';
+      $('#fPenaltyCustom').style.display='block';
+      $('#fPenaltyCustom').value = Number(e.penalty||0);
+    }
+    $('#fPenaltyReason').value = e.penaltyReason||'';
+    $('#fFoodDate').value = e.foodDate||'';
+    $('#fPerm').value = e.perm||'Yes';
+    $('#chkDiscipline').checked = !!e.flags?.discipline;
+    $('#chkUniform').checked = !!e.flags?.uniform;
+    $('#chkObey').checked = !!e.flags?.obey;
+    $('#chkPunctual').checked = !!e.flags?.punctual;
+    $('#fNote').value = e.note||'';
+
+    // Overwrite handlers to update
+    $('#btnSave').onclick = async ()=>{
+      const updated = buildEntryFromForm(e.id);
+      if(!validateEntry(updated)) return;
+      updated.createdAt = e.createdAt;
+      updated.updatedAt = new Date().toISOString();
+      await maybeSyncStaffPhone(updated.staffId, updated.staffPhone);
+      await storagePut('entries', updated);
+      entriesCache = await storageGetAll('entries');
+      await addAudit('entry.update', `${updated.staffName} • ${updated.dateISO}`);
+      renderDashboard();
+      alert('Updated ✅');
+      bindMainButtons();
+    };
+    $('#btnSaveNotify').onclick = async ()=>{
+      const updated = buildEntryFromForm(e.id);
+      if(!validateEntry(updated)) return;
+      updated.createdAt = e.createdAt;
+      updated.updatedAt = new Date().toISOString();
+      await maybeSyncStaffPhone(updated.staffId, updated.staffPhone);
+      await storagePut('entries', updated);
+      entriesCache = await storageGetAll('entries');
+      await addAudit('entry.update', `${updated.staffName} • ${updated.dateISO}`);
+      renderDashboard();
+      openWhatsAppsForEntry(updated);
+      bindMainButtons();
+    };
+  }
+
+  // =========================
+  // REPORTS / EXPORT
+  // =========================
+  function runReport(){
+    const from = $('#rFrom').value;
+    const to = $('#rTo').value;
+    const has = $('#rHas').value;
+    let rows = entriesCache.slice();
+    if(from) rows = rows.filter(r=> r.dateISO >= from);
+    if(to) rows = rows.filter(r=> r.dateISO <= to);
+    if(has==='adv') rows = rows.filter(r=> Number(r.advance||0)>0);
+    if(has==='pen') rows = rows.filter(r=> Number(r.penalty||0)>0);
+    rows.sort((a,b)=> a.dateISO.localeCompare(b.dateISO) || (staffById(a.staffId)?.name||'').localeCompare(staffById(b.staffId)?.name||''));
+    const tbody = $('#reportTable tbody');
+    tbody.innerHTML = rows.map(r=>{
+      const st = staffById(r.staffId)||{};
+      const status =
+        r.leaveType==='Checkout' ? `Check-Out → Return by ${r.expectedReturnDate||'-'}` :
+        r.leaveType==='ReturnCheckin' ? 'Return Check-In' : '';
+      return `<tr>
+        <td>${r.dateISO}</td><td>${st.name||''}</td><td>${r.attendance}</td>
+        <td>${status}</td><td>${Number(r.advance||0)}</td>
+        <td>${Number(r.penalty||0)}</td><td>${r.foodDate||''}</td>
+        <td>${r.promise?.split('|')[1]||''}</td><td>${r.perm||''}</td>
+        <td>${r.note||''}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function exportJSON(){
+    Promise.all([storageGetAll('staff'), storageGetAll('entries'), storageGetAll('audits')]).then(([staff,entries,audits])=>{
+      const data = { exportedAt:new Date().toISOString(), staff, entries, audits };
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'az_staff_backup.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  async function importJSON(file){
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const now = new Date().toISOString();
+    for(const s of (data.staff||[])){ await storagePut('staff', {...s, importedAt:now}); }
+    for(const e of (data.entries||[])){ await storagePut('entries', {...e, importedAt:now}); }
+    for(const a of (data.audits||[])){ await storagePut('audits', {...a, importedAt:now}); }
+    staffCache = await storageGetAll('staff');
+    entriesCache = await storageGetAll('entries');
+    await addAudit('backup.import', `Imported staff:${(data.staff||[]).length}, entries:${(data.entries||[]).length}`);
+    renderDashboard();
+    renderStaffTable();
+  }
+
+  // =========================
+  // BINDINGS
+  // =========================
+  function bindMainButtons(){
+    $('#btnSave').onclick = ()=> saveEntry(false);
+    $('#btnSaveNotify').onclick = ()=> saveEntry(true);
+    $('#btnNotifyOnly').onclick = ()=>{
+      const entry = buildEntryFromForm(uuid()); // preview notify with current form
+      if(!entry.staffId){ alert('Select Staff first.'); return; }
+      if(!/^\+91\d{10}$/.test(entry.staffPhone||'')){ alert('Enter valid Staff Mobile first.'); return; }
+      openWhatsAppsForEntry(entry);
+    };
+    $('#btnReset').onclick = ()=> focusEntryForm();
+  }
+
+  document.addEventListener('click', (e)=>{
+    const a = e.target.closest('a[data-act]');
+    if(!a) return;
+    e.preventDefault();
+    const id = a.dataset.id;
+    const act = a.dataset.act;
+    if(act==='del'){ if(confirm('Delete this entry?')) deleteEntry(id); }
+    if(act==='edit'){ loadEntryToForm(id); }
+    if(act==='notify'){
+      const entry = entriesCache.find(x=>x.id===id);
+      if(entry) openWhatsAppsForEntry(entry);
+    }
+    if(act==='editStaff'){
+      const st = staffCache.find(x=>x.id===id);
+      if(st) openStaffDialog(st);
+    }
+    if(act==='toggleStaff'){
+      toggleStaff(id);
+    }
+  });
+
+  // Filters & misc
+  $('#btnClearFilters').onclick = ()=>{ $('#filterDate').value=''; $('#filterStaff').value=''; renderEntriesTable(); };
+  $('#filterDate').addEventListener('change', renderEntriesTable);
+  $('#filterStaff').addEventListener('change', renderEntriesTable);
+  $('#staffSearch').addEventListener('input', renderStaffTable);
+  $('#btnAddStaff').onclick = ()=> openStaffDialog();
+
+  // Attendance late toggle
+  $('#fAttendance').addEventListener('change', ()=>{
+    $('#lateTimeWrap').style.display = ($('#fAttendance').value==='Late') ? 'block' : 'none';
+  });
+
+  // Staff selection -> auto-fill entry-time phone
+  $('#fStaff').addEventListener('change', ()=>{
+    const st = staffById($('#fStaff').value||'');
+    $('#fStaffPhone').value = st?.phone || '';
+  });
+
+  // Work Status handlers
+  $('#fPenalty').addEventListener('change', setPenaltyCustomVisibility);
+
+  $('#fWorkStatus').addEventListener('change', async ()=>{
+    const mode = $('#fWorkStatus').value;
+    if(mode==='Checkout'){
+      showExpectedReturn(true);
+      const d = new Date(); d.setDate(d.getDate()+3);
+      $('#fExpectedReturn').value = d.toLocaleDateString('en-CA',{timeZone:IST_TZ});
+      $('#fExpectedReturn').focus();
+    } else {
+      showExpectedReturn(false);
+    }
+
+    if(mode==='ReturnCheckin'){
+      const staffId = $('#fStaff').value;
+      if(!staffId){ alert('Select Staff first.'); $('#fWorkStatus').value=''; return; }
+      const open = await getOpenCheckoutFor(staffId);
+      if(open){
+        const today = todayStr();
+        const promised = open.expectedReturnDate || '';
+        if(promised && today > promised){
+          alert(`Promised return was ${promised} — late return detected.\nPlease choose a penalty from dropdown or "Custom (enter salary)".`);
+          $('#fPenalty').value = '500';
+          setPenaltyCustomVisibility();
+          $('#fPenaltyReason').value = `Late return (promised ${promised})`;
+        }
+      } else {
+        alert('No open Check-Out found for this staff. Return Check-In will still be recorded.');
+      }
+    }
+  });
+
+  // Broadcast
+  $('#btnBroadcast').onclick = ()=>{
+    const msg = ($('#broadcastMsg').value||'').trim();
+    const actives = staffCache.filter(s=> (s.status||'Active')==='Active');
+    if(!msg){ alert('Type a message first.'); return; }
+    if(actives.length===0){ alert('No active staff.'); return; }
+    let i = 0;
+    const tick = ()=>{
+      if(i>=actives.length){ alert('Broadcast sequence finished.'); return; }
+      window.open(waLink(actives[i].phone||'', msg), '_blank');
+      i++; setTimeout(tick, 700);
+    };
+    tick();
+  };
+
+  // Reports
+  $('#btnRunRpt').onclick = runReport;
+  $('#btnExportCSV').onclick = ()=>{
+    const rows = $('#reportTable tbody').querySelectorAll('tr');
+    let csv = 'Date,Staff,Att,Status,Adv,Pen,Food,Promise,Perm,Note\n';
+    rows.forEach(tr=>{
+      const tds = tr.querySelectorAll('td');
+      const line = [...tds].map(td=> `"${(td.innerText||'').replace(/"/g,'""')}"`).join(',');
+      csv += line + '\n';
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'report.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Settings
+  $('#btnExport').onclick = exportJSON;
+  $('#btnImport').onclick = ()=> {
+    const f = $('#fileImport').files?.[0];
+    if(!f){ alert('Choose a .json file first.'); return; }
+    importJSON(f);
+  };
+  $('#btnForceLogout').onclick = ()=>{ setLogged(false); gateLoginUI(); };
+
+  // Top bar tabs
+  $$('.tabBtn').forEach(b=> b.addEventListener('click', ()=>{
+    if(!isLogged()){ alert('Login first.'); return; }
+    showTab(b.dataset.tab);
+  }));
+
+  // Login
+  $('#btnLogin').onclick = ()=>{
+    const id = $('#loginId').value.trim();
+    const pw = $('#loginPw').value;
+    if(id===ADMIN_ID && pw===ADMIN_PW){
+      setLogged(true);
+      $('#loginMsg').textContent = '✅ Logged in';
+      gateLoginUI();
+      showTab('dashboard');
+    } else {
+      $('#loginMsg').textContent = '❌ Invalid ID or password';
+    }
+  };
+  $('#btnLogout').onclick = ()=>{ setLogged(false); gateLoginUI(); };
+
+  // Quick Add button
+  $('#quickAdd').onclick = ()=>{ if(!isLogged()) return alert('Login first.'); showTab('entry'); };
+
+  // Init
+  (async function init(){
+    $('#yearNow').textContent = new Date().getFullYear();
+    db = await idbOpen();
+    await seedIfNeeded();
+    staffCache = await storageGetAll('staff');
+    entriesCache = await storageGetAll('entries');
+    gateLoginUI();
+    bindMainButtons();
+    renderDashboard();
+    renderStaffTable();
+  })();
+  </script>
+</body>
+</html>
