@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="or">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Staff Attendance (Secure + GPS + Firestore)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+    .btn{width:100%;padding:10px 14px;border-radius:10px;color:#fff;font-weight:700}
+    .hidden{display:none}
+    .btn-blue{background:#2563eb}.btn-green{background:#16a34a}.btn-yellow{background:#d97706}
+    .btn-brown{background:#854d0e}.btn-red{background:#dc2626}.btn-gray{background:#4b5563}
+    .muted{color:#6b7280}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:100}
+    a.link{color:#2563eb;text-decoration:underline}
+  </style>
+</head>
+<body class="bg-white text-gray-900 min-h-screen">
+
+  <header class="px-5 py-4 bg-green-600 text-white">
+    <h1 class="text-xl font-extrabold">A to Z Packers & Movers  Staff Attendance</h1>
+    <p class="text-sm opacity-90">Secure login  Firestore backup  GPS</p>
+  </header>
+
+  <!-- Auth -->
+  <section class="p-5 max-w-xl mx-auto">
+    <div class="card">
+      <h3 class="text-xl font-bold mb-3">  </h3>
+
+      <div id="staffLogin" class="mb-3">
+        <input id="email" type="email" placeholder="Staff Email" class="border rounded px-3 py-2 w-full mb-2"/>
+        <input id="password" type="password" placeholder="Password" class="border rounded px-3 py-2 w-full mb-2"/>
+        <button id="btnStaffLogin" class="btn btn-blue">Staff Login (Email/Password)</button>
+      </div>
+
+      <div class="text-center text-gray-500 my-2">  </div>
+      <button id="btnBossGoogle" class="btn btn-green">Boss Google Sign-in</button>
+
+      <button id="btnSignOut" class="mt-3 btn btn-gray hidden">Sign out</button>
+      <div id="whoami" class="text-sm text-gray-600 mt-2"></div>
+      <p id="envNote" class="muted text-sm mt-2"></p>
+    </div>
+  </section>
+
+  <!-- Staff Panel -->
+  <section id="app" class="hidden p-5 max-w-xl mx-auto">
+    <div class="card">
+      <h2 class="text-xl font-bold mb-4"> Attendance Panel</h2>
+
+      <label class="flex items-center gap-2 mb-3">
+        <input id="locConsent" type="checkbox" class="w-5 h-5">
+        <span class="text-sm">     (Check-In/Out )</span>
+      </label>
+
+      <div class="space-y-3">
+        <button id="btnCheckIn" class="btn btn-green"> Check In</button>
+        <button id="btnBreakStart" class="btn btn-yellow"> Start Break</button>
+        <button id="btnBreakEnd" class="btn btn-brown"> End Break</button>
+        <button id="btnCheckOut" class="btn btn-red"> Check Out</button>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        <button id="btnHistory" class="btn btn-blue">   </button>
+      </div>
+
+      <p class="muted mt-3 text-sm">: GPS    attendance  ;  location  </p>
+    </div>
+  </section>
+
+  <!-- Boss Panel -->
+  <section id="bossPanel" class="hidden p-5 max-w-3xl mx-auto">
+    <div class="card">
+      <h2 class="text-xl font-bold mb-3"> Boss Dashboard (Read-only)</h2>
+      <p class="muted">  report/summary   </p>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section id="history" class="hidden p-5 max-w-xl mx-auto">
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold">  </h2>
+        <button id="btnBack" class="px-3 py-1 rounded bg-gray-700 text-white text-sm"> Back</button>
+      </div>
+      <div id="historyMeta" class="muted mt-1"></div>
+      <div id="historyList" class="space-y-2 text-sm mt-3"></div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ---------- Small helpers ----------
+    const $ = id => document.getElementById(id);
+    const toast = (m)=>{const t=$('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+    const todayISO = ()=> new Date().toLocaleDateString("en-CA",{ timeZone:"Asia/Kolkata" });
+    const startOfToday = ()=>{ const d=new Date(); d.setHours(0,0,0,0); return d; }
+    const endOfToday   = ()=>{ const d=new Date(); d.setHours(23,59,59,999); return d; }
+  </script>
+
+  <!--  Firebase + Firestore + Auth -->
+  <script type="module">
+    // -------- Config --------
+    const ADMIN_EMAIL = "manojgatibbi506@gmail.com"; // <--  Boss  Gmail 
+
+    const secure = location.protocol === 'https:' || location.hostname === 'localhost';
+    if(!secure){ $('envNote').textContent = " HTTPS    (GitHub Pages OK)"; }
+
+    // Lazy load SDKs
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js");
+    const app = initializeApp({
+      apiKey: "AIzaSyAqAtKOA9eOFl6pj92HPdEBKQw5Lx7O7ws",
+      authDomain: "a-to-z-attendance.firebaseapp.com",
+      projectId: "a-to-z-attendance",
+      storageBucket: "a-to-z-attendance.firebasestorage.app",
+      messagingSenderId: "460745582900",
+      appId: "1:460745582900:web:e7afc7c31f683cc0c71d61"
+    });
+
+    const { getFirestore, doc, setDoc, getDoc, serverTimestamp,
+            collection, query, where, orderBy, getDocs } =
+      await import("https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js");
+    const db = getFirestore(app);
+
+    const { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+            GoogleAuthProvider, signInWithPopup, signOut } =
+      await import("https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js");
+    const auth = getAuth(app);
+
+    // ---------- Auth UI ----------
+    $('btnStaffLogin')?.addEventListener('click', async ()=>{
+      const email = $('email').value.trim();
+      const pass  = $('password').value;
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+      }catch(e){
+        alert("Login failed: " + (e.code || e.name) + "  " + (e.message || ""));
+      }
+    });
+
+    $('btnBossGoogle')?.addEventListener('click', async ()=>{
+      try{
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      }catch(e){ alert("Google sign-in failed: " + e.message); }
+    });
+
+    $('btnSignOut')?.addEventListener('click', ()=> signOut(auth));
+
+    // ---------- GPS ----------
+    async function getGPSIfAllowed(){
+      if (!$('locConsent').checked) return null;  // user consent
+      if (!('geolocation' in navigator)) { toast("GPS  "); return null; }
+      return new Promise((resolve)=> {
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            acc: pos.coords.accuracy
+          }),
+          _err => { toast("GPS "); resolve(null); },
+          { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+        );
+      });
+    }
+
+    // ---------- Firestore write ----------
+    async function writeAttendance(kind){
+      const u = auth.currentUser;
+      if(!u){ toast("  "); return; }
+
+      const gps = await getGPSIfAllowed();
+      const day = todayISO();
+      const id  = `${u.uid}_${Date.now()}`;
+
+      await setDoc(doc(db, "attendance", id), {
+        userId: u.uid,
+        userEmail: u.email || null,
+        type: kind,           // 'checkin' | 'break_start' | 'break_end' | 'checkout'
+        day: day,             // query-friendly
+        ts: serverTimestamp(),
+        gps: gps,             // may be null
+        host: location.hostname
+      }, { merge:true });
+
+      const map = gps ? `  <a class="link" target="_blank" href="https://maps.google.com/?q=${gps.lat},${gps.lng}"></a>` : "";
+      toast(kind.replace("_"," ").toUpperCase() + " " + (gps? " (GPS OK)":""));
+      // optional quick feedback
+      console.log("Saved", {kind, gps});
+    }
+
+    // Buttons
+    $('btnCheckIn').onclick    = ()=> writeAttendance('checkin');
+    $('btnBreakStart').onclick = ()=> writeAttendance('break_start');
+    $('btnBreakEnd').onclick   = ()=> writeAttendance('break_end');
+    $('btnCheckOut').onclick   = ()=> writeAttendance('checkout');
+
+    // ---------- History (today) ----------
+    $('btnHistory').onclick = async ()=>{
+      const u = auth.currentUser;
+      if(!u){ toast(" "); return; }
+
+      const q = query(
+        collection(db, "attendance"),
+        where("userId","==", u.uid),
+        where("day","==", todayISO()),
+        orderBy("ts","asc")
+      );
+      const snaps = await getDocs(q);
+      const rows = [];
+      snaps.forEach(s=>{
+        const d = s.data();
+        let line = ` <b>${d.type.replace("_"," ").toUpperCase()}</b>`;
+        if (d.gps && d.gps.lat) {
+          line += `  <a class="link" target="_blank" href="https://maps.google.com/?q=${d.gps.lat},${d.gps.lng}"></a>`;
+        }
+        rows.push(`<div>${line}</div>`);
+      });
+
+      $('historyMeta').textContent = `${u.email||''}  ${todayISO()}`;
+      $('historyList').innerHTML = rows.length ? rows.join("") : `<div class="muted">   </div>`;
+      $('app').classList.add('hidden'); $('bossPanel').classList.add('hidden'); $('history').classList.remove('hidden');
+    };
+
+    $('btnBack').onclick = ()=>{ $('history').classList.add('hidden'); $('app').classList.remove('hidden'); };
+
+    // ---------- Auth state (Boss vs Staff) ----------
+    onAuthStateChanged(auth, (user)=>{
+      // Hide all
+      $('app')?.classList.add('hidden');
+      $('bossPanel')?.classList.add('hidden');
+      $('history')?.classList.add('hidden');
+
+      if(!user){
+        $('whoami').textContent = "Not signed in";
+        $('btnSignOut')?.classList.add('hidden');
+        return;
+      }
+
+      const prov  = user.providerData[0]?.providerId || "password";
+      const email = user.email || "(no email)";
+      $('whoami').textContent = `Signed in: ${email} (${prov})`;
+      $('btnSignOut')?.classList.remove('hidden');
+
+      const isBoss  = (prov === "google.com") && (user.email === ADMIN_EMAIL);
+      const isStaff = (prov === "password");
+
+      if (isBoss) { $('bossPanel').classList.remove('hidden'); return; }
+      if (isStaff){ $('app').classList.remove('hidden'); return; }
+
+      $('whoami').textContent += "  Limited access";
+    });
+
+    // expose (optional)
+    window._fb = { app, db, auth };
+  </script>
+</body>
+</html>
