@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deulasahi Bazar Committee – Admin Control</title>
+  <style>
+    body{margin:0;padding:22px 14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b1220;color:#fff;}
+    .wrap{max-width:720px;margin:0 auto;}
+    .card{background:#111827;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.35);}
+    h1{margin:0 0 10px;font-size:22px;font-weight:1000;}
+    .muted{color:#cbd5e1;font-size:13px;line-height:1.4;}
+    label{display:block;margin-top:12px;font-weight:900;font-size:13px;color:#e5e7eb;}
+    input,textarea{width:100%;margin-top:6px;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:#0b1220;color:#fff;font-size:16px;outline:none;}
+    button{margin-top:12px;width:100%;border:none;border-radius:14px;padding:12px 14px;font-weight:1000;font-size:16px;cursor:pointer;}
+    .btnOn{background:#16a34a;color:#052e12;}
+    .btnOff{background:#ef4444;color:#450a0a;}
+    .btnGet{background:#2563eb;color:#0b1220;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;}
+    .row button{flex:1;min-width:180px;}
+    .status{margin-top:12px;padding:12px;border-radius:14px;background:#0b1220;border:1px dashed rgba(255,255,255,.16);font-weight:900;}
+    code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:8px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Admin Control – Receipt Disable / Enable</h1>
+      <div class="muted">
+        This admin page can <b>disable the receipt system globally</b> if misuse happens.<br>
+        Works with a simple <b>Google Apps Script Web App</b> (JSON API).<br><br>
+        1) Paste your Web App URL in both this Admin page and the Receipt page.<br>
+        2) Use <b>Disable</b> to stop all form filling immediately.
+      </div>
+
+      <label for="api">ADMIN API URL (Google Apps Script Web App)</label>
+      <input id="api" placeholder="https://script.google.com/macros/s/XXXX/exec" / value="https://script.google.com/macros/s/AKfycbzu7u7K0QkvqRkvHp-Z70l-JuIGrYvURXrIbZWHexqDoLQxkWG4MipQBkp6YOQXJkFC9w/exec">
+
+      <label for="token">ADMIN TOKEN / KEY</label>
+      <input id="token" placeholder="Enter your secret token" />
+
+      <label for="note">Reason / Note (optional)</label>
+      <textarea id="note" rows="3" placeholder="Example: Misuse detected, temporarily disabled."></textarea>
+
+      <div class="row">
+        <button class="btnGet" type="button" onclick="getStatus()">🔍 Check Status</button>
+        <button class="btnOff" type="button" onclick="setStatus(false)">⛔ Disable Now</button>
+        <button class="btnOn" type="button" onclick="setStatus(true)">✅ Enable Now</button>
+      </div>
+
+      <div class="status" id="statusBox">Status: —</div>
+
+      <div class="muted" style="margin-top:14px;">
+        <b>Apps Script API format</b> (you can deploy in Google Apps Script):<br>
+        • <code>?action=get</code> → returns JSON { enabled: true/false, note: "..." }<br>
+        • <code>?action=set&enabled=1&token=YOURTOKEN&note=...</code><br><br>
+        If you want, tell me your token (or I can suggest a strong one), and I can also provide the exact Apps Script code.
+      </div>
+    </div>
+  </div>
+
+<script>
+async function getStatus(){
+  const api = document.getElementById("api").value.trim();
+  if(!api) return alert("Paste ADMIN API URL first.");
+  try{
+    const r = await fetch(api + "?action=get", {cache:"no-store"});
+    const data = await r.json();
+    document.getElementById("statusBox").textContent =
+      "Status: " + (data.enabled ? "ENABLED ✅" : "DISABLED ⛔") + (data.note ? (" | " + data.note) : "");
+  }catch(e){
+    alert("Could not reach Admin API. Check internet / URL.");
+  }
+}
+
+async function setStatus(enabled){
+  const api = document.getElementById("api").value.trim();
+  const token = document.getElementById("token").value.trim();
+  const note = document.getElementById("note").value.trim();
+  if(!api) return alert("Paste ADMIN API URL first.");
+  if(!token) return alert("Enter ADMIN TOKEN.");
+  const url = api + "?action=set&enabled=" + (enabled ? "1" : "0") +
+    "&token=" + encodeURIComponent(token) +
+    "&note=" + encodeURIComponent(note);
+  try{
+    const r = await fetch(url, {cache:"no-store"});
+    const data = await r.json();
+    if(data.ok){
+      document.getElementById("statusBox").textContent =
+        "Status: " + (data.enabled ? "ENABLED ✅" : "DISABLED ⛔") + (data.note ? (" | " + data.note) : "");
+      alert("Updated: " + (data.enabled ? "Enabled" : "Disabled"));
+    }else{
+      alert("Failed: " + (data.error || "Unknown error"));
+    }
+  }catch(e){
+    alert("Could not update. Check internet / URL.");
+  }
+}
+</script>
+</body>
+</html>
